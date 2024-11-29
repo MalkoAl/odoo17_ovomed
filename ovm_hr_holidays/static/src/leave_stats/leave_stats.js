@@ -71,8 +71,8 @@ export class LeaveStatsComponent extends Component {
     }
 }
 
-LeaveStatsComponent.template = "custom_leave_widget.LeaveStatsComponent";
+LeaveStatsComponent.template = "ovm_hr_holidays.LeaveStatsComponent";
 
-registry.category("view_widgets").add("custom_leave_stats", {
+registry.category("view_widgets").add("hr_leave_stats", {
     component: LeaveStatsComponent,
 });
