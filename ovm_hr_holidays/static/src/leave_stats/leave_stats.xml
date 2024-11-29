@@ -1,0 +1,21 @@
+<odoo>
+    <templates>
+        <t t-name="custom_leave_widget.LeaveStatsComponent">
+            <div t-foreach="state.leaves" t-as="leave" t-key="leave.id" class="leave-item">
+                <div class="d-flex flex-row justify-content-between fw-bold">
+                    <span t-esc="leave.holiday_status_id[1]" />
+                    <span t-esc="leave.state" class="badge" />
+                </div>
+                <div class="d-flex flex-row justify-content-between text-muted small">
+                    <span>
+                        <t t-esc="leave.number_of_days" /> day(s)
+                    </span>
+                    <span t-if="leave.dateFrom &amp; leave.dateTo">
+                        <t t-esc="leave.dateFrom" /> - <t t-esc="leave.dateTo" />
+                    </span>
+                </div>
+            </div>
+        </t>
+    </templates>
+</odoo>
+
