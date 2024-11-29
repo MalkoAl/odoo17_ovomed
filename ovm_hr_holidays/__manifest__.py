@@ -4,6 +4,9 @@
     "author": "MOP",
     "category": "Human Resources",
     "depends": ["web", "hr_holidays"],
+    "data": [
+        'views/ovm_hr_leave_views.xml',
+    ],
     "assets": {
         "web.assets_backend": [
             "/ovm_hr_holidays/static/src/leave_stats/leave_stats.js",

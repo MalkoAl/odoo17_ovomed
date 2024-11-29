@@ -54,9 +54,7 @@ export class LeaveStatsComponent extends Component {
                 ["date_from", "<=", dateTo],
                 ["date_to", ">=", dateFrom],
             ],
-            {
-                fields: ["holiday_status_id", "number_of_days", "date_from", "date_to", "state"],
-            }
+            ["holiday_status_id", "number_of_days", "date_from", "date_to", "state", "department_id"]
         );
 
         this.state.leaves = this.state.leaves.map((leave) => ({
@@ -67,12 +65,14 @@ export class LeaveStatsComponent extends Component {
             dateTo: leave.date_to
                 ? formatDate(DateTime.fromSQL(leave.date_to, { zone: "utc" }).toLocal())
                 : "N/A",
+            departmentName: leave.department_id ? leave.department_id[1] : "No Department",
+//            applicationName: leave.application_id ? leave.application_id[1] : "No Application",
         }));
     }
 }
 
 LeaveStatsComponent.template = "ovm_hr_holidays.LeaveStatsComponent";
 
-registry.category("view_widgets").add("hr_leave_stats", {
+registry.category("view_widgets").add("ovm_hr_leave_stats", {
     component: LeaveStatsComponent,
 });
