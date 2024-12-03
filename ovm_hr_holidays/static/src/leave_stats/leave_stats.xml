@@ -1,28 +1,28 @@
 <templates>
     <t t-name="ovm_hr_holidays.LeaveStatsComponent">
-        <div t-foreach="state.leaves" t-as="leave" t-key="leave.id" class="leave-item">
-            <div class="d-flex flex-row justify-content-between fw-bold">
-                <span t-esc="leave.departmentName" class="text-primary"/>
-                <span t-esc="leave.holiday_status_id[1]"/>
-                <span t-esc="leave.state" class="badge"/>
-            </div>
-<!--            <div class="text-muted small">-->
-<!--                <span>-->
-<!--                    <t t-esc="leave.name"/>-->
-<!--                </span>-->
-<!--            </div>-->
-            <div class="d-flex flex-row justify-content-between text-muted small">
-                <span>
-                    <t t-esc="leave.number_of_days"/>
-                    day(s)
-                </span>
-                <span t-if="leave.dateFrom and leave.dateTo">
-                    <t t-esc="leave.dateFrom"/>
-                    -
-                    <t t-esc="leave.dateTo"/>
-                </span>
-            </div>
+        <div>
+            <h3>Leave Details</h3>
+            <ul>
+                <li t-foreach="Object.keys(state.groupedLeaves)" t-as="department" t-key="department">
+                    <h4 class="text-primary"><t t-esc="department" /></h4>
+                    <ul>
+                        <li t-foreach="Object.keys(state.groupedLeaves[department])" t-as="holidayType" t-key="holidayType">
+                            <h5> <t t-esc="holidayType" /></h5>
+                            <ul>
+                                <li t-foreach="state.groupedLeaves[department][holidayType]" t-as="leave" t-key="leave.id">
+                                    <div class="d-flex flex-row justify-content-between small">
+                                        <span>
+                                            <t t-esc="leave.dateFrom" /> - <t t-esc="leave.dateTo" />
+                                        </span>
+                                        <span><t t-esc="leave.state" /></span>
+                                        <span><t t-esc="leave.numberOfDays" /> day(s)</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </t>
 </templates>
-

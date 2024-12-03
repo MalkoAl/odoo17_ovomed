@@ -15,7 +15,7 @@ export class LeaveStatsComponent extends Component {
         this.orm = useService("orm");
 
         this.state = useState({
-            leaves: [],
+            groupedLeaves: {},
         });
 
         this.date = this.props.record.data.date_from || DateTime.now();
@@ -40,39 +40,66 @@ export class LeaveStatsComponent extends Component {
 
     async loadLeaves(date, employee) {
         if (!(employee && date)) {
-            this.state.leaves = [];
+            this.state.groupedLeaves = {};
             return;
         }
 
-        const dateFrom = date.startOf("year");
-        const dateTo = date.endOf("year");
+        try {
+            const dateFrom = date.startOf("year");
+            const dateTo = date.endOf("year");
 
-        this.state.leaves = await this.orm.searchRead(
-            "hr.leave",
-            [
-                ["employee_id", "=", employee[0]],
-                ["date_from", "<=", dateTo],
-                ["date_to", ">=", dateFrom],
-            ],
-            ["holiday_status_id", "number_of_days", "date_from", "date_to", "state", "department_id"]
-        );
+            const leaves = await this.orm.searchRead(
+                "hr.leave",
+                [
+                    ["employee_id", "=", employee[0]],
+                    ["date_from", "<=", dateTo],
+                    ["date_to", ">=", dateFrom],
+                ],
+                ["holiday_status_id", "number_of_days", "date_from", "date_to", "state", "department_id"]
+            );
 
-        this.state.leaves = this.state.leaves.map((leave) => ({
-            ...leave,
-            dateFrom: leave.date_from
-                ? formatDate(DateTime.fromSQL(leave.date_from, { zone: "utc" }).toLocal())
-                : "N/A",
-            dateTo: leave.date_to
-                ? formatDate(DateTime.fromSQL(leave.date_to, { zone: "utc" }).toLocal())
-                : "N/A",
-            departmentName: leave.department_id ? leave.department_id[1] : "No Department",
-//            applicationName: leave.application_id ? leave.application_id[1] : "No Application",
-        }));
+            const groupedData = leaves.reduce((acc, leave) => {
+                const departmentName = leave.department_id && leave.department_id.length > 1
+                    ? leave.department_id[1]
+                    : "No Department";
+
+                const holidayType = leave.holiday_status_id && leave.holiday_status_id.length > 1
+                    ? leave.holiday_status_id[1]
+                    : "Unknown Type";
+
+                if (!acc[departmentName]) {
+                    acc[departmentName] = {};
+                }
+
+                if (!acc[departmentName][holidayType]) {
+                    acc[departmentName][holidayType] = [];
+                }
+
+                acc[departmentName][holidayType].push({
+                    dateFrom: leave.date_from
+                        ? formatDate(DateTime.fromSQL(leave.date_from, { zone: "utc" }).toLocal())
+                        : "N/A",
+                    dateTo: leave.date_to
+                        ? formatDate(DateTime.fromSQL(leave.date_to, { zone: "utc" }).toLocal())
+                        : "N/A",
+                    numberOfDays: leave.number_of_days || 0,
+                    state: leave.state,
+                    id: leave.id,
+                });
+
+                return acc;
+            }, {});
+
+            this.state.groupedLeaves = groupedData;
+
+            console.log("Grouped Leaves:", this.state.groupedLeaves);
+        } catch (error) {
+            console.error("Failed to load leaves:", error);
+            this.state.groupedLeaves = {};
+        }
     }
 }
-
 LeaveStatsComponent.template = "ovm_hr_holidays.LeaveStatsComponent";
-
 registry.category("view_widgets").add("ovm_hr_leave_stats", {
     component: LeaveStatsComponent,
 });
